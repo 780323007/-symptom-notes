@@ -10,8 +10,8 @@
     <th>便签 · Notes</th>
   </tr>
   <tr>
-    <td><img src="docs/images/daily-log-example.svg" alt="应用示例：按天分组的时间记录" width="320"></td>
-    <td><img src="docs/images/notes-example.svg" alt="应用示例：不带时间的便签" width="320"></td>
+    <td><img src="docs/images/daily-log-example.jpg" alt="应用示例：按天分组的时间记录" width="320"></td>
+    <td><img src="docs/images/notes-example.jpg" alt="应用示例：不带时间的便签" width="320"></td>
   </tr>
 </table>
 
