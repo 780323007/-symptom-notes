@@ -1,0 +1,29 @@
+name: Publish example JPEG images
+on:
+  push:
+    paths:
+      - 'docs/images/*.jpg.b64'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: main
+      - name: Restore original images and update README
+        shell: bash
+        run: |
+          for name in daily-log-example notes-example; do
+            base64 --decode "docs/images/$name.jpg.b64" > "docs/images/$name.jpg"
+            rm "docs/images/$name.jpg.b64"
+            rm "docs/images/$name.svg"
+          done
+          sed -i 's/daily-log-example.svg/daily-log-example.jpg/g; s/notes-example.svg/notes-example.jpg/g' README.md
+          rm .github/workflows/publish-example-images.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/images .github/workflows/publish-example-images.yml
+          git commit -m "Use original JPEG screenshots in app examples"
+          git push origin HEAD:main
