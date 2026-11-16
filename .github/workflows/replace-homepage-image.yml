@@ -1,0 +1,25 @@
+name: Replace homepage first image
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/replace-homepage-image.yml']
+permissions:
+  contents: write
+jobs:
+  replace-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Replace first screenshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode docs/images/daily-log-example.jpg.b64 > docs/images/daily-log-example.jpg
+          echo '2089a0c1e5d1711d1a7035e19f58e5a78bdd02f88c8faccf90462d6fa2bcf855  docs/images/daily-log-example.jpg' | sha256sum --check
+          git rm docs/images/daily-log-example.jpg.b64 .github/workflows/replace-homepage-image.yml
+          git add docs/images/daily-log-example.jpg
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m '替换主页第一张时间记录截图'
+          git push origin HEAD:main
