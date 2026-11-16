@@ -1,0 +1,31 @@
+name: Publish Symptom Notes v1.5
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-v1.5.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify APK and publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          base64 --decode releases/v1.5.0/symptom-notes.apk.b64 > "$RUNNER_TEMP/symptom-notes.apk"
+          (cd "$RUNNER_TEMP" && sha256sum --check "$GITHUB_WORKSPACE/releases/v1.5.0/SHA256SUMS.txt")
+          if gh release view v1.5.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            test "$(gh release view v1.5.0 --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" = true
+          else
+            gh release create v1.5.0 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --draft --title '症状笔记 v1.5：新增左右滑动切换' --notes-file releases/v1.5.0/RELEASE_NOTES.md
+          fi
+          gh release upload v1.5.0 "$RUNNER_TEMP/symptom-notes.apk" releases/v1.5.0/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+          gh release edit v1.5.0 --repo "$GITHUB_REPOSITORY" --draft=false --latest
